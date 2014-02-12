@@ -122,6 +122,8 @@ int LibVirtDriver::deployment_description_kvm(
     string  default_driver_cache    = "";
     string  default_driver_disk_io  = "";
     bool    readonly;
+    bool    shareable;
+    int     shareable_found         = -1;
 
     const VectorAttribute * nic;
 
@@ -387,6 +389,7 @@ int LibVirtDriver::deployment_description_kvm(
         gluster_volume  = disk->vector_value("GLUSTER_VOLUME");
 
         disk->vector_value_str("DISK_ID", disk_id);
+        shareable_found = disk->vector_value("SHAREABLE", shareable);
 
         if (target.empty())
         {
@@ -403,6 +406,11 @@ int LibVirtDriver::deployment_description_kvm(
             {
                 readonly = true;
             }
+        }
+
+        if ( shareable_found != 0 )
+        {
+            get_default("DISK", "SHAREABLE", shareable);
         }
 
         // ---- Disk type and source for the image ----
@@ -490,6 +498,11 @@ int LibVirtDriver::deployment_description_kvm(
         if (readonly)
         {
             file << "\t\t\t<readonly/>" << endl;
+        }
+
+        if (shareable)
+        {
+            file << "\t\t\t<shareable/>" << endl;
         }
 
         // ---- Image Format using qemu driver ----
