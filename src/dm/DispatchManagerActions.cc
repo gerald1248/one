@@ -42,7 +42,9 @@ int DispatchManager::deploy (
     LifeCycleManager *  lcm = nd.get_lcm();
 
     if ( vm->get_state() == VirtualMachine::PENDING ||
-         vm->get_state() == VirtualMachine::HOLD )
+         vm->get_state() == VirtualMachine::HOLD ||
+         vm->get_state() == VirtualMachine::STOPPED ||
+         vm->get_state() == VirtualMachine::UNDEPLOYED )
     {
         vm->set_state(VirtualMachine::ACTIVE);
 
