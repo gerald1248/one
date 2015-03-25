@@ -159,6 +159,12 @@ var lcm_state_actions = {
         ["VM.migrate"],
     39: //OpenNebula.VM.lcm_state.PROLOG_FAILURE:
         ["VM.deploy"],
+    40: //OpenNebula.VM.lcm_state.EPILOG_FAILURE:
+        ["VM.shutdown", "VM.shutdown_hard"],
+    41: //OpenNebula.VM.lcm_state.EPILOG_STOP_FAILURE:
+        ["VM.stop"],
+    42: //OpenNebula.VM.lcm_state.EPILOG_UNDEPLOY_FAILURE:
+        ["VM.undeploy", "VM.undeploy_hard"],
 }
 
 //Permanent storage for last value of aggregated network usage

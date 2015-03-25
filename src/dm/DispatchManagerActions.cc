@@ -242,7 +242,8 @@ int DispatchManager::shutdown (
 
     if (vm->get_state()     == VirtualMachine::ACTIVE &&
         (vm->get_lcm_state() == VirtualMachine::RUNNING ||
-         vm->get_lcm_state() == VirtualMachine::UNKNOWN))
+         vm->get_lcm_state() == VirtualMachine::UNKNOWN ||
+         vm->get_lcm_state() == VirtualMachine::EPILOG_FAILURE))
     {
         Nebula&             nd  = Nebula::instance();
         LifeCycleManager *  lcm = nd.get_lcm();
@@ -290,7 +291,8 @@ int DispatchManager::undeploy(
 
     if (vm->get_state()     == VirtualMachine::ACTIVE &&
         (vm->get_lcm_state() == VirtualMachine::RUNNING ||
-         vm->get_lcm_state() == VirtualMachine::UNKNOWN))
+         vm->get_lcm_state() == VirtualMachine::UNKNOWN ||
+         vm->get_lcm_state() == VirtualMachine::EPILOG_UNDEPLOY_FAILURE))
     {
         Nebula&             nd  = Nebula::instance();
         LifeCycleManager *  lcm = nd.get_lcm();
@@ -487,8 +489,9 @@ int DispatchManager::stop(
     oss << "Stopping VM " << vid;
     NebulaLog::log("DiM",Log::DEBUG,oss);
 
-    if (vm->get_state()     == VirtualMachine::ACTIVE &&
-        vm->get_lcm_state() == VirtualMachine::RUNNING )
+    if (vm->get_state()      == VirtualMachine::ACTIVE &&
+        (vm->get_lcm_state() == VirtualMachine::RUNNING ||
+         vm->get_lcm_state() == VirtualMachine::EPILOG_STOP_FAILURE))
     {
         Nebula&             nd  = Nebula::instance();
         LifeCycleManager *  lcm = nd.get_lcm();
@@ -534,7 +537,8 @@ int DispatchManager::cancel(
 
     if (vm->get_state()     == VirtualMachine::ACTIVE &&
         (vm->get_lcm_state() == VirtualMachine::RUNNING ||
-         vm->get_lcm_state() == VirtualMachine::UNKNOWN))
+         vm->get_lcm_state() == VirtualMachine::UNKNOWN ||
+         vm->get_lcm_state() == VirtualMachine::EPILOG_FAILURE))
     {
         Nebula&             nd  = Nebula::instance();
         LifeCycleManager *  lcm = nd.get_lcm();
