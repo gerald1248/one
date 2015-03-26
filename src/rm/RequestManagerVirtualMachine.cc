@@ -925,11 +925,13 @@ void VirtualMachineMigrate::request_execute(xmlrpc_c::paramList const& paramList
 
     if ( (vm->hasPreviousHistory() && vm->get_previous_reason() == History::NONE) ||
          (vm->get_state()     != VirtualMachine::POWEROFF &&
+          vm->get_state()     != VirtualMachine::SUSPENDED &&
            ( vm->get_state()      != VirtualMachine::ACTIVE  ||
             ( vm->get_lcm_state() != VirtualMachine::RUNNING &&
               vm->get_lcm_state() != VirtualMachine::UNKNOWN &&
               vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_FAILURE &&
-              vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE) ) )
+              vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE &&
+              vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_SUSPEND_FAILURE) ) )
        )
     {
         failure_response(ACTION,
@@ -946,7 +948,8 @@ void VirtualMachineMigrate::request_execute(xmlrpc_c::paramList const& paramList
 
     if (vm->get_state() == VirtualMachine::ACTIVE &&
           (vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE ||
-           vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE) )
+           vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE ||
+           vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_SUSPEND_FAILURE) )
     {
         enforce = false;
         live = false;
