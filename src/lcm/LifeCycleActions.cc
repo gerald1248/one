@@ -299,7 +299,8 @@ void  LifeCycleManager::migrate_action(int vid)
         vmm->trigger(VirtualMachineManager::SAVE,vid);
     }
     else if (vm->get_state() == VirtualMachine::ACTIVE &&
-             vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE)
+             (vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE ||
+              vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE))
     {
         //----------------------------------------------------
         //   Bypass SAVE_MIGRATE
@@ -313,7 +314,14 @@ void  LifeCycleManager::migrate_action(int vid)
 
         vm->set_resched(false);
 
-        vm->set_state(VirtualMachine::PROLOG_MIGRATE);
+        if (vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE)
+        {
+            vm->set_state(VirtualMachine::PROLOG_MIGRATE);
+        }
+        else
+        {
+            vm->set_state(VirtualMachine::PROLOG_MIGRATE_POWEROFF);
+        }
 
         vm->delete_snapshots();
 
@@ -346,6 +354,74 @@ void  LifeCycleManager::migrate_action(int vid)
         hpool->del_capacity(vm->get_previous_hid(), vm->get_oid(), cpu, mem, disk);
 
         vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE");
+
+        //----------------------------------------------------
+
+        tm->trigger(TransferManager::PROLOG_MIGR,vid);
+    }
+    else if (vm->get_state() == VirtualMachine::POWEROFF)
+    {
+        Nebula& nd = Nebula::instance();
+        TransferManager * tm = nd.get_tm();
+
+        int    cpu, mem, disk;
+        time_t the_time = time(0);
+
+        //----------------------------------------------------
+        //   Bypass SAVE_MIGRATE STATE
+        //----------------------------------------------------
+
+        //vm->set_state(VirtualMachine::SAVE_MIGRATE);
+
+        vm->set_resched(false);
+
+        vmpool->update(vm);
+
+        vm->set_stime(time(0));
+
+        //vm->set_previous_action(History::MIGRATE_ACTION);
+
+        vmpool->update_history(vm);
+
+        vm->get_requirements(cpu,mem,disk);
+
+        hpool->add_capacity(vm->get_hid(), vm->get_oid(), cpu, mem, disk);
+
+        //vm->log("LCM", Log::INFO, "New VM state is SAVE_MIGRATE");
+
+        //----------------------------------------------------
+        //           PROLOG_MIGRATE_POWEROFF STATE
+        //----------------------------------------------------
+
+        vm->set_state(VirtualMachine::ACTIVE);
+        vm->set_state(VirtualMachine::PROLOG_MIGRATE_POWEROFF);
+
+        vm->delete_snapshots();
+
+        map<string, string> empty;
+        vm->update_info(0, 0, -1, -1, empty);
+
+        vmpool->update(vm);
+
+        //vm->set_previous_etime(the_time);
+
+        //vm->set_previous_vm_info();
+
+        //vm->set_previous_running_etime(the_time);
+
+        //vm->set_previous_reason(History::USER);
+
+        //vmpool->update_previous_history(vm);
+
+        vm->set_prolog_stime(the_time);
+
+        vmpool->update_history(vm);
+
+        vm->get_requirements(cpu,mem,disk);
+
+        hpool->del_capacity(vm->get_previous_hid(), vm->get_oid(), cpu, mem, disk);
+
+        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_POWEROFF");
 
         //----------------------------------------------------
 
@@ -1256,6 +1332,8 @@ void  LifeCycleManager::clean_up_vm(VirtualMachine * vm, bool dispose, int& imag
 
         case VirtualMachine::PROLOG_MIGRATE:
         case VirtualMachine::PROLOG_MIGRATE_FAILURE:
+        case VirtualMachine::PROLOG_MIGRATE_POWEROFF:
+        case VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE:
             vm->set_prolog_etime(the_time);
             vmpool->update_history(vm);
 
@@ -1329,6 +1407,8 @@ void  LifeCycleManager::recover(VirtualMachine * vm, bool success)
         case VirtualMachine::PROLOG_RESUME:
         case VirtualMachine::PROLOG_UNDEPLOY:
         case VirtualMachine::PROLOG_FAILURE:
+        case VirtualMachine::PROLOG_MIGRATE_POWEROFF:
+        case VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE:
             if (success)
             {
                 lcm_action = LifeCycleManager::PROLOG_SUCCESS;

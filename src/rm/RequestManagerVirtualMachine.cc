@@ -923,11 +923,14 @@ void VirtualMachineMigrate::request_execute(xmlrpc_c::paramList const& paramList
         return;
     }
 
-    if((vm->get_state()     != VirtualMachine::ACTIVE)  ||
-       (vm->get_lcm_state() != VirtualMachine::RUNNING &&
-        vm->get_lcm_state() != VirtualMachine::UNKNOWN &&
-        vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_FAILURE) ||
-       (vm->hasPreviousHistory() && vm->get_previous_reason() == History::NONE))
+    if ( (vm->hasPreviousHistory() && vm->get_previous_reason() == History::NONE) ||
+         (vm->get_state()     != VirtualMachine::POWEROFF &&
+           ( vm->get_state()      != VirtualMachine::ACTIVE  ||
+            ( vm->get_lcm_state() != VirtualMachine::RUNNING &&
+              vm->get_lcm_state() != VirtualMachine::UNKNOWN &&
+              vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_FAILURE &&
+              vm->get_lcm_state() != VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE) ) )
+       )
     {
         failure_response(ACTION,
                 request_error("Wrong state to perform action",""),
@@ -942,7 +945,8 @@ void VirtualMachineMigrate::request_execute(xmlrpc_c::paramList const& paramList
     c_hid = vm->get_hid();
 
     if (vm->get_state() == VirtualMachine::ACTIVE &&
-        vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE)
+          (vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_FAILURE ||
+           vm->get_lcm_state() == VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE) )
     {
         enforce = false;
         live = false;
@@ -958,7 +962,9 @@ void VirtualMachineMigrate::request_execute(xmlrpc_c::paramList const& paramList
         {
             ostringstream oss;
 
-            oss << "VM in state PROLOG_MIGRATE_FAILURE can only be migrated to "
+            oss << "VM in state "
+                << VirtualMachine::lcm_state_to_str(vm->get_lcm_state())
+                << " can only be migrated to "
                 << object_name(PoolObjectSQL::HOST) << " [" << c_hid << "] or "
                 << object_name(PoolObjectSQL::HOST) << " [" << p_hid << "]";
 
