@@ -633,6 +633,30 @@ void  LifeCycleManager::shutdown_action(int vid)
 
         tm->trigger(TransferManager::EPILOG,vid);
     }
+    else if (vm->get_state() == VirtualMachine::SUSPENDED ||
+             vm->get_state() == VirtualMachine::POWEROFF)
+    {
+        //----------------------------------------------------
+        //   Bypass SHUTDOWN
+        //----------------------------------------------------
+
+        vm->set_state(VirtualMachine::ACTIVE);
+        vm->set_state(VirtualMachine::EPILOG);
+
+        vmpool->update(vm);
+
+        vm->set_action(History::SHUTDOWN_ACTION);
+
+        vm->set_epilog_stime(time(0));
+
+        vmpool->update_history(vm);
+
+        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
+
+        //----------------------------------------------------
+
+        tm->trigger(TransferManager::EPILOG,vid);
+    }
     else
     {
         vm->log("LCM", Log::ERROR, "shutdown_action, VM in a wrong state.");
@@ -931,6 +955,30 @@ void  LifeCycleManager::cancel_action(int vid)
         vm->set_state(VirtualMachine::EPILOG);
 
         vmpool->update(vm);
+
+        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
+
+        //----------------------------------------------------
+
+        tm->trigger(TransferManager::EPILOG,vid);
+    }
+    else if (vm->get_state() == VirtualMachine::SUSPENDED ||
+             vm->get_state() == VirtualMachine::POWEROFF)
+    {
+        //----------------------------------------------------
+        //   Bypass CANCEL
+        //----------------------------------------------------
+
+        vm->set_state(VirtualMachine::ACTIVE);
+        vm->set_state(VirtualMachine::EPILOG);
+
+        vmpool->update(vm);
+
+        vm->set_action(History::SHUTDOWN_ACTION);
+
+        vm->set_epilog_stime(time(0));
+
+        vmpool->update_history(vm);
 
         vm->log("LCM", Log::INFO, "New VM state is EPILOG");
 
