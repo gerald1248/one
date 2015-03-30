@@ -456,7 +456,7 @@ void LifeCycleManager::do_action(const string &action, void * arg)
     }
     else if (action == "CANCEL")
     {
-        cancel_action(vid);
+        shutdown_action(vid, true);
     }
     else if (action == "MIGRATE")
     {
@@ -468,7 +468,7 @@ void LifeCycleManager::do_action(const string &action, void * arg)
     }
     else if (action == "SHUTDOWN")
     {
-        shutdown_action(vid);
+        shutdown_action(vid, false);
     }
     else if (action == "UNDEPLOY")
     {

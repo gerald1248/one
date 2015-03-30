@@ -551,7 +551,7 @@ void  LifeCycleManager::live_migrate_action(int vid)
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-void  LifeCycleManager::shutdown_action(int vid)
+void  LifeCycleManager::shutdown_action(int vid, bool hard)
 {
     VirtualMachine *    vm;
 
@@ -574,19 +574,29 @@ void  LifeCycleManager::shutdown_action(int vid)
         //                  SHUTDOWN STATE
         //----------------------------------------------------
 
-        vm->set_state(VirtualMachine::SHUTDOWN);
+        if (hard)
+        {
+            vm->set_state(VirtualMachine::CANCEL);
+            vm->set_action(History::SHUTDOWN_HARD_ACTION);
+
+            //----------------------------------------------------
+
+            vmm->trigger(VirtualMachineManager::CANCEL,vid);
+        }
+        else
+        {
+            vm->set_state(VirtualMachine::SHUTDOWN);
+            vm->set_action(History::SHUTDOWN_ACTION);
+
+            //----------------------------------------------------
+
+            vmm->trigger(VirtualMachineManager::SHUTDOWN,vid);
+        }
 
         vm->set_resched(false);
 
         vmpool->update(vm);
-
-        vm->set_action(History::SHUTDOWN_ACTION);
-
         vmpool->update_history(vm);
-
-        //----------------------------------------------------
-
-        vmm->trigger(VirtualMachineManager::SHUTDOWN,vid);
     }
     else if (vm->get_state()     == VirtualMachine::ACTIVE &&
              vm->get_lcm_state() == VirtualMachine::EPILOG_FAILURE)
@@ -854,93 +864,6 @@ void  LifeCycleManager::restore_action(int vid)
     else
     {
         vm->log("LCM", Log::ERROR, "restore_action, VM in a wrong state.");
-    }
-
-    vm->unlock();
-
-    return;
-}
-
-/* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-
-void  LifeCycleManager::cancel_action(int vid)
-{
-    VirtualMachine *    vm;
-
-    Nebula&                 nd = Nebula::instance();
-    VirtualMachineManager * vmm = nd.get_vmm();
-    TransferManager *       tm = nd.get_tm();
-
-    vm = vmpool->get(vid,true);
-
-    if ( vm == 0 )
-    {
-        return;
-    }
-
-    if (vm->get_state()     == VirtualMachine::ACTIVE &&
-        (vm->get_lcm_state() == VirtualMachine::RUNNING ||
-         vm->get_lcm_state() == VirtualMachine::UNKNOWN))
-    {
-        //----------------------------------------------------
-        //                  CANCEL STATE
-        //----------------------------------------------------
-
-        vm->set_state(VirtualMachine::CANCEL);
-
-        vm->set_resched(false);
-
-        vmpool->update(vm);
-
-        vm->set_action(History::SHUTDOWN_HARD_ACTION);
-
-        vmpool->update_history(vm);
-
-        //----------------------------------------------------
-
-        vmm->trigger(VirtualMachineManager::CANCEL,vid);
-    }
-    else if (vm->get_state()     == VirtualMachine::ACTIVE &&
-             vm->get_lcm_state() == VirtualMachine::EPILOG_FAILURE)
-    {
-        //----------------------------------------------------
-        //   Bypass CANCEL
-        //----------------------------------------------------
-
-        vm->set_state(VirtualMachine::EPILOG);
-
-        vmpool->update(vm);
-
-        //----------------------------------------------------
-
-        tm->trigger(TransferManager::EPILOG,vid);
-    }
-    else if (vm->get_state() == VirtualMachine::SUSPENDED ||
-             vm->get_state() == VirtualMachine::POWEROFF)
-    {
-        //----------------------------------------------------
-        //   Bypass CANCEL
-        //----------------------------------------------------
-
-        vm->set_state(VirtualMachine::ACTIVE);
-        vm->set_state(VirtualMachine::EPILOG);
-
-        vmpool->update(vm);
-
-        vm->set_action(History::SHUTDOWN_ACTION);
-
-        vm->set_epilog_stime(time(0));
-
-        vmpool->update_history(vm);
-
-        //----------------------------------------------------
-
-        tm->trigger(TransferManager::EPILOG,vid);
-    }
-    else
-    {
-        vm->log("LCM", Log::ERROR, "cancel_action, VM in a wrong state.");
     }
 
     vm->unlock();
