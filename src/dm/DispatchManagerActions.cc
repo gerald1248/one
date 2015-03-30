@@ -227,7 +227,8 @@ error:
 /* ************************************************************************** */
 
 int DispatchManager::shutdown (
-    int vid)
+    int     vid,
+    string& error_str)
 {
     ostringstream       oss;
     VirtualMachine *    vm;
@@ -264,10 +265,13 @@ int DispatchManager::shutdown (
     return 0;
 
 error:
-
     oss.str("");
     oss << "Could not shutdown VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
+
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
 
     vm->unlock();
     return -2;
@@ -277,8 +281,9 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::undeploy(
-    int vid,
-    bool hard)
+    int     vid,
+    bool    hard,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -325,6 +330,10 @@ error:
     oss << "Could not undeploy VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -333,8 +342,9 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::poweroff (
-    int vid,
-    bool hard)
+    int     vid,
+    bool    hard,
+    string& error_str)
 {
     ostringstream       oss;
     VirtualMachine *    vm;
@@ -380,6 +390,10 @@ error:
     oss << "Could not power off VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -388,7 +402,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::hold(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -424,6 +439,10 @@ error:
     oss << "Could not hold VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -432,7 +451,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::release(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -467,6 +487,10 @@ error:
     oss << "Could not release VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -475,7 +499,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::stop(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -514,6 +539,10 @@ error:
     oss << "Could not stop VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -522,7 +551,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::cancel(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -563,6 +593,10 @@ error:
     oss << "Could not cancel VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -571,7 +605,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::suspend(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -608,6 +643,10 @@ error:
     oss << "Could not suspend VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -616,7 +655,8 @@ error:
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::resume(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -666,6 +706,10 @@ error:
     oss << "Could not resume VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
     return -2;
 }
@@ -673,7 +717,9 @@ error:
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int DispatchManager::restart(int vid)
+int DispatchManager::restart(
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -719,6 +765,10 @@ error:
     oss << "Could not restart VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
 
     return -2;
@@ -727,7 +777,9 @@ error:
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int DispatchManager::reboot(int vid)
+int DispatchManager::reboot(
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -768,6 +820,10 @@ error:
     oss << "Could not reboot VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
 
     return -2;
@@ -776,7 +832,9 @@ error:
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int DispatchManager::reset(int vid)
+int DispatchManager::reset(
+    int     vid,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -817,6 +875,10 @@ error:
     oss << "Could not reset VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
 
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
+
     vm->unlock();
 
     return -2;
@@ -825,7 +887,10 @@ error:
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int DispatchManager::resched(int vid, bool do_resched)
+int DispatchManager::resched(
+    int     vid,
+    bool    do_resched,
+    string& error_str)
 {
     VirtualMachine *    vm;
     ostringstream       oss;
@@ -860,6 +925,10 @@ error:
     oss.str("");
     oss << "Could not set rescheduling flag for VM " << vid << ", wrong state.";
     NebulaLog::log("DiM",Log::ERROR,oss);
+
+    oss.str("");
+    oss << "This action is not available for state " << vm->state_str();
+    error_str = oss.str();
 
     vm->unlock();
 
@@ -900,7 +969,8 @@ void DispatchManager::finalize_cleanup(VirtualMachine * vm)
 /* -------------------------------------------------------------------------- */
 
 int DispatchManager::finalize(
-    int vid)
+    int     vid,
+    string& error_str)
 {
     VirtualMachine * vm;
     ostringstream oss;
@@ -969,7 +1039,9 @@ int DispatchManager::finalize(
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-int DispatchManager::resubmit(int vid)
+int DispatchManager::resubmit(
+    int     vid,
+    string& error_str)
 {
     VirtualMachine * vm;
     ostringstream    oss;
@@ -989,14 +1061,14 @@ int DispatchManager::resubmit(int vid)
     switch (vm->get_state())
     {
         case VirtualMachine::POWEROFF:
-            NebulaLog::log("DiM",Log::ERROR,
-                "Cannot delete-recreate a powered off VM. Resume it first");
+            error_str = "Cannot delete-recreate a powered off VM. Resume it first";
+            NebulaLog::log("DiM",Log::ERROR,error_str);
             rc = -2;
         break;
 
         case VirtualMachine::SUSPENDED:
-            NebulaLog::log("DiM",Log::ERROR,
-                "Cannot delete-recreate a suspended VM. Resume it first");
+            error_str = "Cannot delete-recreate a suspended VM. Resume it first";
+            NebulaLog::log("DiM",Log::ERROR,error_str);
             rc = -2;
         break;
 
@@ -1027,8 +1099,8 @@ int DispatchManager::resubmit(int vid)
         break;
 
         case VirtualMachine::DONE:
-            NebulaLog::log("DiM",Log::ERROR,
-                "Cannot delete-recreate a VM already in DONE state");
+            error_str = "Cannot delete-recreate a VM already in DONE state";
+            NebulaLog::log("DiM",Log::ERROR,error_str);
             rc = -2;
         break;
     }
@@ -1084,7 +1156,8 @@ int DispatchManager::attach(int vid,
     }
     else
     {
-        oss << "Could not attach a new disk to VM " << vid << ", wrong state.";
+        oss << "Could not attach a new disk to VM " << vid << ", wrong state "
+            << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1201,7 +1274,8 @@ int DispatchManager::detach(
           vm->get_lcm_state() != VirtualMachine::RUNNING ) &&
         vm->get_state()       != VirtualMachine::POWEROFF)
     {
-        oss << "Could not detach disk from VM " << vid << ", wrong state.";
+        oss << "Could not detach disk from VM " << vid << ", wrong state "
+            << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1282,7 +1356,7 @@ int DispatchManager::snapshot_create(
          vm->get_lcm_state() != VirtualMachine::RUNNING )
     {
         oss << "Could not create a new snapshot for VM " << vid
-            << ", wrong state.";
+            << ", wrong state " << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1338,7 +1412,7 @@ int DispatchManager::snapshot_revert(
          vm->get_lcm_state() != VirtualMachine::RUNNING )
     {
         oss << "Could not revert VM " << vid << " to snapshot " << snap_id
-            << ", wrong state.";
+            << ", wrong state " << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1407,7 +1481,7 @@ int DispatchManager::snapshot_delete(
          vm->get_lcm_state() != VirtualMachine::RUNNING )
     {
         oss << "Could not delete snapshot " << snap_id << " for VM " << vid
-            << ", wrong state.";
+            << ", wrong state " << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1483,7 +1557,8 @@ int DispatchManager::attach_nic(
           vm->get_lcm_state() != VirtualMachine::RUNNING ) &&
         vm->get_state()       != VirtualMachine::POWEROFF )
     {
-        oss << "Could not add a new NIC to VM " << vid << ", wrong state.";
+        oss << "Could not add a new NIC to VM " << vid << ", wrong state "
+            << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);
@@ -1626,7 +1701,8 @@ int DispatchManager::detach_nic(
           vm->get_lcm_state() != VirtualMachine::RUNNING ) &&
         vm->get_state()       != VirtualMachine::POWEROFF )
     {
-        oss << "Could not detach NIC from VM " << vid << ", wrong state.";
+        oss << "Could not detach NIC from VM " << vid << ", wrong state "
+            << vm->state_str() << ".";
         error_str = oss.str();
 
         NebulaLog::log("DiM", Log::ERROR, error_str);

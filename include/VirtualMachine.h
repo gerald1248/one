@@ -271,6 +271,21 @@ public:
         return st;
     }
 
+    /**
+     * Returns the VM state to string, using the lcm state if the current state
+     * is ACTIVE.
+     * @return the state sting
+     */
+    string state_str()
+    {
+        if (state == ACTIVE)
+        {
+            return lcm_state_to_str(lcm_state);
+        }
+
+        return vm_state_to_str(state);
+    }
+
     // -------------------------------------------------------------------------
     // Log & Print
     // -------------------------------------------------------------------------
