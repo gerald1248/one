@@ -106,8 +106,6 @@ void  LifeCycleManager::deploy_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG.");
-
         //----------------------------------------------------
 
         tm->trigger(tm_action,vid);
@@ -118,8 +116,6 @@ void  LifeCycleManager::deploy_action(int vid)
         vm->set_state(VirtualMachine::PROLOG);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG.");
 
         tm->trigger(TransferManager::PROLOG,vid);
     }
@@ -166,8 +162,6 @@ void  LifeCycleManager::suspend_action(int vid)
         vm->set_action(History::SUSPEND_ACTION);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is SAVE_SUSPEND");
 
         //----------------------------------------------------
 
@@ -218,8 +212,6 @@ void  LifeCycleManager::stop_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is SAVE_STOP");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::SAVE,vid);
@@ -234,8 +226,6 @@ void  LifeCycleManager::stop_action(int vid)
         vm->set_state(VirtualMachine::EPILOG_STOP);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_STOP");
 
         //----------------------------------------------------
 
@@ -257,8 +247,6 @@ void  LifeCycleManager::stop_action(int vid)
         vm->set_epilog_stime(time(0));
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_STOP");
 
         //----------------------------------------------------
 
@@ -317,8 +305,6 @@ void  LifeCycleManager::migrate_action(int vid)
         vm->get_requirements(cpu,mem,disk);
 
         hpool->add_capacity(vm->get_hid(), vm->get_oid(), cpu, mem, disk);
-
-        vm->log("LCM", Log::INFO, "New VM state is SAVE_MIGRATE");
 
         //----------------------------------------------------
 
@@ -380,8 +366,6 @@ void  LifeCycleManager::migrate_action(int vid)
 
         hpool->del_capacity(vm->get_previous_hid(), vm->get_oid(), cpu, mem, disk);
 
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE");
-
         //----------------------------------------------------
 
         tm->trigger(TransferManager::PROLOG_MIGR,vid);
@@ -409,8 +393,6 @@ void  LifeCycleManager::migrate_action(int vid)
 
         hpool->add_capacity(vm->get_hid(), vm->get_oid(), cpu, mem, disk);
 
-        //vm->log("LCM", Log::INFO, "New VM state is SAVE_MIGRATE");
-
         //----------------------------------------------------
         //           PROLOG_MIGRATE_POWEROFF STATE
         //----------------------------------------------------
@@ -420,14 +402,10 @@ void  LifeCycleManager::migrate_action(int vid)
         if (vm->get_state() == VirtualMachine::POWEROFF)
         {
             vm->set_state(VirtualMachine::PROLOG_MIGRATE_POWEROFF);
-
-            vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_POWEROFF");
         }
         else //if (vm->get_state() == VirtualMachine::SUSPENDED)
         {
             vm->set_state(VirtualMachine::PROLOG_MIGRATE_SUSPEND);
-
-            vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_SUSPEND");
         }
 
         vm->delete_snapshots();
@@ -500,8 +478,6 @@ void  LifeCycleManager::migrate_action(int vid)
 
         hpool->del_capacity(vm->get_previous_hid(), vm->get_oid(), cpu, mem, disk);
 
-        vm->log("LCM", Log::INFO, "New VM state is BOOT");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::DEPLOY, vid);
@@ -558,8 +534,6 @@ void  LifeCycleManager::live_migrate_action(int vid)
 
         hpool->add_capacity(vm->get_hid(), vm->get_oid(), cpu, mem, disk);
 
-        vm->log("LCM",Log::INFO,"New VM state is MIGRATE");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::MIGRATE,vid);
@@ -610,8 +584,6 @@ void  LifeCycleManager::shutdown_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM",Log::INFO,"New VM state is SHUTDOWN");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::SHUTDOWN,vid);
@@ -626,8 +598,6 @@ void  LifeCycleManager::shutdown_action(int vid)
         vm->set_state(VirtualMachine::EPILOG);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
 
         //----------------------------------------------------
 
@@ -650,8 +620,6 @@ void  LifeCycleManager::shutdown_action(int vid)
         vm->set_epilog_stime(time(0));
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
 
         //----------------------------------------------------
 
@@ -699,8 +667,6 @@ void  LifeCycleManager::undeploy_action(int vid, bool hard)
 
         vmpool->update(vm);
 
-        vm->log("LCM",Log::INFO,"New VM state is SHUTDOWN_UNDEPLOY");
-
         //----------------------------------------------------
 
         if (hard)
@@ -729,8 +695,6 @@ void  LifeCycleManager::undeploy_action(int vid, bool hard)
 
         vmpool->update(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY");
-
         //----------------------------------------------------
 
         tm->trigger(TransferManager::EPILOG_STOP,vid);
@@ -751,8 +715,6 @@ void  LifeCycleManager::undeploy_action(int vid, bool hard)
         vm->set_epilog_stime(time(0));
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY");
 
         //----------------------------------------------------
 
@@ -815,8 +777,6 @@ void  LifeCycleManager::poweroff_action(int vid, bool hard)
         vm->set_resched(false);
 
         vmpool->update(vm);
-
-        vm->log("LCM",Log::INFO,"New VM state is SHUTDOWN_POWEROFF");
 
         //----------------------------------------------------
 
@@ -887,8 +847,6 @@ void  LifeCycleManager::restore_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New state is BOOT_SUSPENDED");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::RESTORE,vid);
@@ -939,8 +897,6 @@ void  LifeCycleManager::cancel_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New state is CANCEL");
-
         //----------------------------------------------------
 
         vmm->trigger(VirtualMachineManager::CANCEL,vid);
@@ -955,8 +911,6 @@ void  LifeCycleManager::cancel_action(int vid)
         vm->set_state(VirtualMachine::EPILOG);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
 
         //----------------------------------------------------
 
@@ -979,8 +933,6 @@ void  LifeCycleManager::cancel_action(int vid)
         vm->set_epilog_stime(time(0));
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
 
         //----------------------------------------------------
 
@@ -1061,8 +1013,6 @@ void  LifeCycleManager::restart_action(int vid)
 
                     vmpool->update(vm);
 
-                    vm->log("LCM", Log::INFO, "New VM state is BOOT_UNKNOWN");
-
                     break;
 
                 case VirtualMachine::BOOT_FAILURE:
@@ -1072,8 +1022,6 @@ void  LifeCycleManager::restart_action(int vid)
 
                     vmpool->update(vm);
 
-                    vm->log("LCM", Log::INFO, "New VM state is BOOT");
-
                     break;
 
                 case VirtualMachine::BOOT_MIGRATE_FAILURE:
@@ -1082,8 +1030,6 @@ void  LifeCycleManager::restart_action(int vid)
                     vm->set_state(VirtualMachine::BOOT_MIGRATE);
 
                     vmpool->update(vm);
-
-                    vm->log("LCM", Log::INFO, "New VM state is BOOT_MIGRATE");
 
                     break;
 
@@ -1109,8 +1055,6 @@ void  LifeCycleManager::restart_action(int vid)
             vm->set_running_stime(the_time);
 
             vmpool->update_history(vm);
-
-            vm->log("LCM", Log::INFO, "New VM state is BOOT_POWEROFF");
         }
 
         vmm->trigger(action,vid);
@@ -1279,8 +1223,6 @@ void  LifeCycleManager::clean_up_vm(VirtualMachine * vm, bool dispose, int& imag
 
     VirtualMachine::LcmState state = vm->get_lcm_state();
     int                      vid   = vm->get_oid();
-
-    vm->log("LCM", Log::INFO, "New VM state is CLEANUP.");
 
     if (dispose)
     {

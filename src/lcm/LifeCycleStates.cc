@@ -70,8 +70,6 @@ void  LifeCycleManager::save_success_action(int vid)
 
         hpool->del_capacity(vm->get_previous_hid(), vm->get_oid(), cpu, mem, disk);
 
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE");
-
         //----------------------------------------------------
 
         tm->trigger(TransferManager::PROLOG_MIGR,vid);
@@ -133,8 +131,6 @@ void  LifeCycleManager::save_success_action(int vid)
         vm->set_reason(History::USER);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_STOP");
 
         //----------------------------------------------------
 
@@ -300,8 +296,6 @@ void  LifeCycleManager::deploy_success_action(int vid)
         vm->delete_snapshots();
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is RUNNING");
     }
     else if ( vm->get_lcm_state() == VirtualMachine::BOOT ||
               vm->get_lcm_state() == VirtualMachine::BOOT_POWEROFF ||
@@ -316,8 +310,6 @@ void  LifeCycleManager::deploy_success_action(int vid)
         vm->set_state(VirtualMachine::RUNNING);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is RUNNING");
     }
     else
     {
@@ -409,8 +401,6 @@ void  LifeCycleManager::deploy_failure_action(int vid)
         vm->set_state(VirtualMachine::BOOT_FAILURE);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is BOOT_FAILURE");
     }
     else if (vm->get_lcm_state() == VirtualMachine::BOOT_MIGRATE ||
              vm->get_lcm_state() == VirtualMachine::BOOT_MIGRATE_FAILURE )
@@ -418,16 +408,12 @@ void  LifeCycleManager::deploy_failure_action(int vid)
         vm->set_state(VirtualMachine::BOOT_MIGRATE_FAILURE);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is BOOT_MIGRATE_FAILURE");
     }
     else if (vm->get_lcm_state() == VirtualMachine::BOOT_UNKNOWN)
     {
         vm->set_state(VirtualMachine::UNKNOWN);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is UNKNOWN");
     }
     else if (vm->get_lcm_state() == VirtualMachine::BOOT_POWEROFF)
     {
@@ -439,8 +425,6 @@ void  LifeCycleManager::deploy_failure_action(int vid)
 
         vmpool->update(vm);
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is POWEROFF");
     }
     else if (vm->get_lcm_state() == VirtualMachine::BOOT_SUSPENDED)
     {
@@ -452,8 +436,6 @@ void  LifeCycleManager::deploy_failure_action(int vid)
 
         vmpool->update(vm);
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is SUSPENDED");
     }
     else if (vm->get_lcm_state() == VirtualMachine::BOOT_STOPPED)
     {
@@ -476,8 +458,6 @@ void  LifeCycleManager::deploy_failure_action(int vid)
         vm->set_reason(History::ERROR);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is EPILOG_STOP");
 
         //----------------------------------------------------
 
@@ -504,8 +484,6 @@ void  LifeCycleManager::deploy_failure_action(int vid)
         vm->set_reason(History::ERROR);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "Fail to boot VM. New VM state is EPILOG_UNDEPLOY");
 
         //----------------------------------------------------
 
@@ -560,8 +538,6 @@ void  LifeCycleManager::shutdown_success_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
-
         //----------------------------------------------------
 
         tm->trigger(TransferManager::EPILOG,vid);
@@ -615,8 +591,6 @@ void  LifeCycleManager::shutdown_success_action(int vid)
         vm->set_reason(History::USER);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY");
 
         //----------------------------------------------------
 
@@ -749,8 +723,6 @@ void LifeCycleManager::prolog_success_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is BOOT");
-
         //----------------------------------------------------
 
         vmm->trigger(action,vid);
@@ -832,29 +804,21 @@ void  LifeCycleManager::prolog_failure_action(int vid)
     {
         vm->set_state(VirtualMachine::PROLOG_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_FAILURE");
     }
     else if ( state == VirtualMachine::PROLOG_MIGRATE )
     {
         vm->set_state(VirtualMachine::PROLOG_MIGRATE_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_FAILURE");
     }
     else if ( state == VirtualMachine::PROLOG_MIGRATE_POWEROFF )
     {
         vm->set_state(VirtualMachine::PROLOG_MIGRATE_POWEROFF_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_POWEROFF_FAILURE");
     }
     else if ( state == VirtualMachine::PROLOG_MIGRATE_SUSPEND )
     {
         vm->set_state(VirtualMachine::PROLOG_MIGRATE_SUSPEND_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is PROLOG_MIGRATE_SUSPEND_FAILURE");
     }
     else if ( state == VirtualMachine::PROLOG_RESUME )
     {
@@ -960,22 +924,16 @@ void  LifeCycleManager::epilog_success_action(int vid)
     {
         vm->set_state(VirtualMachine::EPILOG_STOP);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_STOP");
     }
     else if ( state == VirtualMachine::EPILOG_UNDEPLOY_FAILURE )
     {
         vm->set_state(VirtualMachine::EPILOG_UNDEPLOY);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY");
     }
     else if ( state == VirtualMachine::EPILOG_FAILURE )
     {
         vm->set_state(VirtualMachine::EPILOG);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
     }
 
     state = vm->get_lcm_state();
@@ -1094,22 +1052,16 @@ void  LifeCycleManager::epilog_failure_action(int vid)
     {
         vm->set_state(VirtualMachine::EPILOG_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_FAILURE");
     }
     else if ( state == VirtualMachine::EPILOG_STOP )
     {
         vm->set_state(VirtualMachine::EPILOG_STOP_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_STOP_FAILURE");
     }
     else if ( state == VirtualMachine::EPILOG_UNDEPLOY )
     {
         vm->set_state(VirtualMachine::EPILOG_UNDEPLOY_FAILURE);
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY_FAILURE");
     }
     else
     {
@@ -1162,8 +1114,6 @@ void  LifeCycleManager::cancel_success_action(int vid)
 
         vmpool->update_history(vm);
 
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG");
-
         //----------------------------------------------------
 
         tm->trigger(TransferManager::EPILOG,vid);
@@ -1190,8 +1140,6 @@ void  LifeCycleManager::cancel_success_action(int vid)
         vm->set_reason(History::USER);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is EPILOG_UNDEPLOY");
 
         //----------------------------------------------------
 
@@ -1337,6 +1285,8 @@ void  LifeCycleManager::monitor_suspend_action(int vid)
         //                  SAVE_SUSPEND STATE
         //----------------------------------------------------
 
+        vm->log("LCM", Log::INFO, "Polling reports that the VM is suspended.");
+
         vm->set_state(VirtualMachine::SAVE_SUSPEND);
 
         vm->set_resched(false);
@@ -1357,8 +1307,6 @@ void  LifeCycleManager::monitor_suspend_action(int vid)
         vm->set_reason(History::ERROR);
 
         vmpool->update_history(vm);
-
-        vm->log("LCM", Log::INFO, "VM is suspended.");
 
         //----------------------------------------------------
 
@@ -1397,8 +1345,6 @@ void  LifeCycleManager::monitor_done_action(int vid)
         vm->set_resched(false);
 
         vmpool->update(vm);
-
-        vm->log("LCM", Log::INFO, "New VM state is UNKNOWN");
     }
     // This event can be received when the VM is in PROLOG, BOOT...
     // and other transient states (through host monitor probe).
@@ -1495,8 +1441,6 @@ void  LifeCycleManager::monitor_poweron_action(int vid)
             vm->set_last_poll(the_time);
 
             vmpool->update_history(vm);
-
-            vm->log("LCM", Log::INFO, "New VM state is RUNNING");
     }
 
     vm->unlock();

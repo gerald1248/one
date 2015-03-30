@@ -82,8 +82,10 @@ public:
         return 0;
     }
 
-    static string& vm_state_to_str(string& st, VmState state)
+    static string vm_state_to_str(VmState state)
     {
+        string st;
+
         switch (state)
         {
             case INIT      : st = "INIT"; break;
@@ -301,6 +303,18 @@ public:
         {
             _log->log(module,type,message);
         }
+    };
+
+    /**
+     *  writes a log message in vm.log. The class lock should be locked and
+     *  the VM MUST BE obtained through the VirtualMachinePool get() method.
+     */
+    void log(
+        const char *            module,
+        const Log::MessageType  type,
+        const string&           message) const
+    {
+        log(module, type, message.c_str());
     };
 
     /**
@@ -1037,6 +1051,8 @@ public:
     void set_state(VmState s)
     {
         state = s;
+
+        log("VM", Log::INFO, "New state is "+vm_state_to_str(s));
     };
 
     /**
@@ -1046,6 +1062,8 @@ public:
     void set_state(LcmState s)
     {
         lcm_state = s;
+
+        log("VM", Log::INFO, "New LCM state is "+lcm_state_to_str(s));
     };
 
     /**
